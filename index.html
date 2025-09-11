@@ -17,6 +17,10 @@
     
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css?v=2024">
+    
     <style>
         * {
             margin: 0;
@@ -188,10 +192,25 @@
             border: 2px solid var(--border);
             border-top: none;
             border-radius: 0 0 12px 12px;
-            max-height: 300px;
+            max-height: 200px;
             overflow-y: auto;
+            overflow-x: hidden;
             z-index: 1000;
             display: none;
+            scrollbar-width: thin;
+        }
+        
+        .search-dropdown::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .search-dropdown::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        .search-dropdown::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
         }
 
         .search-dropdown.active {
@@ -337,8 +356,8 @@
         }
 
         .gift-image {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             border-radius: 12px;
             margin: 0 auto 12px;
             object-fit: cover;
@@ -459,7 +478,6 @@
         
         #purchases-results {
               margin-top: 24px;
-              min-height: 200px;
           }
 
         .close-btn:hover {
@@ -549,7 +567,7 @@
                     </div>
                     <div class="search-field">
                         <label for="model-search">Model (Optional)</label>
-                        <input type="text" id="model-search" class="search-input" placeholder="Select model..." autocomplete="off">
+                        <input type="text" id="model-search" class="search-input" placeholder="First select a gift..." autocomplete="off" disabled>
                         <div class="search-dropdown" id="model-dropdown">
                             <div class="dropdown-grid" id="model-results"></div>
                         </div>
@@ -605,7 +623,7 @@
                         </div>
                         <div class="search-field">
                             <label for="purchase-model-search">Model (Optional)</label>
-                            <input type="text" id="purchase-model-search" class="search-input" placeholder="Select model..." autocomplete="off">
+                            <input type="text" id="purchase-model-search" class="search-input" placeholder="First select a gift..." autocomplete="off" disabled>
                             <div class="search-dropdown" id="purchase-model-dropdown">
                                 <div class="dropdown-grid" id="purchase-model-results"></div>
                             </div>
@@ -625,9 +643,13 @@
                         <span>📊</span> Get Purchases
                     </button>
                 </div>
-            </div>
             
+            <!-- Results Container -->
             <div id="purchases-results"></div>
+
+        </div>
+            
+
         </div>
     </div>
 

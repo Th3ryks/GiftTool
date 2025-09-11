@@ -1,0 +1,58 @@
+{
+  "name": "gift-arbitrage",
+  "version": "1.0.0",
+  "description": "Smart arbitrage tool for Telegram gifts - Compare prices across different platforms",
+  "main": "index.html",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build needed'",
+    "start": "vercel dev",
+    "deploy": "vercel --prod",
+    "preview": "vercel",
+    "lint": "echo 'No linting configured'",
+    "test": "echo 'No tests configured'"
+  },
+  "dependencies": {
+    "@vercel/edge": "^0.1.2"
+  },
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "telegram",
+    "mini-app",
+    "arbitrage",
+    "gifts",
+    "price-comparison",
+    "vercel",
+    "webapp"
+  ],
+  "author": "Th3ryks",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Th3ryks/GiftTool.git"
+  },
+  "homepage": "https://gifttool.th3ryks.vercel.app",
+  "vercel": {
+    "functions": {
+      "app.js": {
+        "runtime": "@vercel/static"
+      }
+    },
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "/api/$1"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/index.html"
+      }
+    ]
+  }
+}

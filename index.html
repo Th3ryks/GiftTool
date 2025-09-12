@@ -19,7 +19,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <!-- External CSS -->
-    <link rel="stylesheet" href="styles.css?v=2024">
+    <link rel="stylesheet" href="styles.css?v=2026">
     
     <style>
         * {
@@ -552,6 +552,11 @@
                 <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
             </div>
         </header>
+        
+
+        
+        <!-- Main Container -->
+        <div id="main-container" class="page-container">
 
         <div class="search-section">
 
@@ -648,12 +653,50 @@
             <div id="purchases-results"></div>
 
         </div>
-            
-
-        </div>
     </div>
+        </div>
+        
+        <!-- Last Purchases Container -->
+        <div id="last-container" class="page-container" style="display: none;">
+            <div class="search-section">
+                <div class="search-grid">
+                    <div class="search-row">
+                        <div class="search-field">
+                            <label for="last-gift-search">Gift Name *</label>
+                            <input type="text" id="last-gift-search" class="search-input" placeholder="Search for a gift..." autocomplete="off">
+                            <div class="search-dropdown" id="last-gift-dropdown">
+                                <div class="dropdown-grid" id="last-gift-results"></div>
+                            </div>
+                        </div>
+                        <div class="search-field">
+                            <label for="last-model-search">Model (Optional)</label>
+                            <input type="text" id="last-model-search" class="search-input" placeholder="First select a gift..." autocomplete="off" disabled>
+                            <div class="search-dropdown" id="last-model-dropdown">
+                                <div class="dropdown-grid" id="last-model-results"></div>
+                            </div>
+                        </div>
+                        <div class="search-field">
+                            <label for="last-backdrop-search">Backdrop (Optional)</label>
+                            <input type="text" id="last-backdrop-search" class="search-input" placeholder="Select backdrop..." autocomplete="off">
+                            <div class="search-dropdown" id="last-backdrop-dropdown">
+                                <div class="dropdown-grid" id="last-backdrop-results"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="get-last-purchases-btn" onclick="getLastPurchases()" disabled>
+                        <span>📊</span> Get Purchases
+                    </button>
+                </div>
+            </div>
+            
+            <div id="last-purchases-results"></div>
+        </div>
+        
 
-
+    </div>
 
     <script src="app.js"></script>
 </body>

@@ -49,6 +49,23 @@ let selectedModel = null;
 let selectedBackdrop = null;
 let searchTimeout = null;
 
+/* --- ROUTING SYSTEM --- */
+// Simplified initialization without routing
+function initApp() {
+    // Show main container by default
+    const mainContainer = document.getElementById('main-container');
+    if (mainContainer) {
+        mainContainer.style.display = 'block';
+        initMainPage();
+    }
+    
+    // Hide last container by default
+    const lastContainer = document.getElementById('last-container');
+    if (lastContainer) {
+        lastContainer.style.display = 'none';
+    }
+}
+
 /* --- HELPER FUNCTIONS --- */
 // Helper function to convert text to Title Case
 function toTitleCase(str) {
@@ -388,8 +405,8 @@ async function fetchTgMarketData() {
     const maxRetries = 3;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-            const url = new URL(`${API_CONFIG.giftSatellite.baseUrl}/tg-market/search/${encodeURIComponent(toTitleCase(selectedGift.name))}`);
-            url.searchParams.append('models', selectedModel ? toTitleCase(selectedModel.name) : '');
+            const url = new URL(`${API_CONFIG.giftSatellite.baseUrl}/tg-market/search/${encodeURIComponent(selectedGift.name)}`);
+            url.searchParams.append('models', selectedModel ? selectedModel.name : '');
             url.searchParams.append('backdrops', selectedBackdrop ? selectedBackdrop.name : '');
             
             const response = await fetch(url, {
@@ -424,8 +441,8 @@ async function fetchPortalsData() {
     const maxRetries = 3;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-            const url = new URL(`${API_CONFIG.searchSatellite.baseUrl}/portals/api/search/${encodeURIComponent(toTitleCase(selectedGift.name))}`);
-            url.searchParams.append('models', selectedModel ? toTitleCase(selectedModel.name) : '');
+            const url = new URL(`${API_CONFIG.searchSatellite.baseUrl}/portals/api/search/${encodeURIComponent(selectedGift.name)}`);
+            url.searchParams.append('models', selectedModel ? selectedModel.name : '');
             url.searchParams.append('backdrops', selectedBackdrop ? selectedBackdrop.name : '');
             
             const response = await fetch(url, {
@@ -457,8 +474,8 @@ async function fetchPortalsData() {
 }
 
 async function fetchMrktData() {
-    const url = new URL(`${API_CONFIG.searchSatellite.baseUrl}/mrkt/api/search/${encodeURIComponent(toTitleCase(selectedGift.name))}`);
-    url.searchParams.append('models', selectedModel ? toTitleCase(selectedModel.name) : '');
+    const url = new URL(`${API_CONFIG.searchSatellite.baseUrl}/mrkt/api/search/${encodeURIComponent(selectedGift.name)}`);
+    url.searchParams.append('models', selectedModel ? selectedModel.name : '');
     url.searchParams.append('backdrops', selectedBackdrop ? selectedBackdrop.name : '');
     
     const response = await fetch(url, {
@@ -479,8 +496,8 @@ async function fetchMrktData() {
 }
 
 async function fetchTonnelData() {
-    const url = new URL(`${API_CONFIG.searchSatellite.baseUrl}/tonnel/api/search/${encodeURIComponent(toTitleCase(selectedGift.name))}`);
-    url.searchParams.append('models', selectedModel ? toTitleCase(selectedModel.name) : '');
+    const url = new URL(`${API_CONFIG.searchSatellite.baseUrl}/tonnel/api/search/${encodeURIComponent(selectedGift.name)}`);
+    url.searchParams.append('models', selectedModel ? selectedModel.name : '');
     url.searchParams.append('backdrops', selectedBackdrop ? selectedBackdrop.name : '');
     
     const response = await fetch(url, {
@@ -500,6 +517,7 @@ async function fetchTonnelData() {
 }
 
 async function getLastPurchases() {
+    // Use modal elements
     const giftInput = document.getElementById('purchase-gift-search');
     const modelInput = document.getElementById('purchase-model-search');
     const backdropInput = document.getElementById('purchase-backdrop-search');
@@ -644,7 +662,8 @@ function setupEventListeners() {
     
     // Close modals when clicking outside
     window.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
+        // Only close modal if clicking directly on the modal backdrop, not on modal content
+        if (e.target.classList.contains('modal') && !e.target.closest('.modal-content')) {
             e.target.style.display = 'none';
         }
     });
@@ -748,16 +767,16 @@ function displayGiftDropdown(gifts, dropdown, input) {
         return;
     }
     
-    // Add grid class for >4 results
-    const gridClass = gifts.length > 4 ? 'dropdown-grid' : '';
-    dropdown.className = `dropdown ${gridClass}`;
+    // Add grid class for >2 results
+    const gridClass = gifts.length > 2 ? 'dropdown-grid' : '';
+    dropdown.className = `search-dropdown ${gridClass}`;
     
     dropdown.innerHTML = gifts.map(gift => `
         <div class="dropdown-item vertical" onclick="selectGift('${gift._id}', '${gift.name.replace(/'/g, "\\'")}')">            <div style="position: relative; display: inline-block;">
-                <img src="${gift.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAzNiAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjM2IiBoZWlnaHQ9IjM2IiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIxOCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Pz88L3RleHQ+Cjwvc3ZnPgo='}" 
+                <img src="${gift.imageUrl}" 
                      alt="${gift.name}" 
                      class="dropdown-image"
-                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAzNiAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjM2IiBoZWlnaHQ9IjM2IiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIxOCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Pz88L3RleHQ+Cjwvc3ZnPgo='">
+                     style="display: ${gift.imageUrl ? 'block' : 'none'}">
             </div>
             <span>${gift.name}</span>
         </div>
@@ -772,13 +791,17 @@ function displayModelDropdown(models, dropdown, input) {
         return;
     }
     
+    // Add grid class for >2 results
+    const gridClass = models.length > 2 ? 'dropdown-grid' : '';
+    dropdown.className = `search-dropdown ${gridClass}`;
+    
     dropdown.innerHTML = models.map(model => `
         <div class="dropdown-item vertical" onclick="selectModel('${model._id}', '${model.name.replace(/'/g, "\\'")}')">            <img src="https://storage.googleapis.com/portals-market/gifts/${encodeURIComponent(selectedGift?.name?.replace(/[^a-zA-Z]/g, '').toLowerCase() || '')}/models/png/${encodeURIComponent(model.name?.replace(/[^a-zA-Z]/g, '').toLowerCase() || '')}.png" 
                  alt="${model.name}" 
                  class="dropdown-image"
-                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAzNiAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjM2IiBoZWlnaHQ9IjM2IiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIxOCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Pz88L3RleHQ+Cjwvc3ZnPgo='">
+                 style="display: block">
             <span>${model.name}</span>
-            <small class="rarity">Rarity: ${model.rarity || 'Unknown'}</small>
+            <small class="rarity">Rarity: ${model.rarity ? (model.rarity / 10).toFixed(1) : 'Unknown'}</small>
         </div>
     `).join('');
     
@@ -790,6 +813,10 @@ function displayBackdropDropdown(backdrops, dropdown, input) {
         dropdown.style.display = 'none';
         return;
     }
+    
+    // Add grid class for >2 results
+    const gridClass = backdrops.length > 2 ? 'dropdown-grid' : '';
+    dropdown.className = `search-dropdown ${gridClass}`;
     
     dropdown.innerHTML = backdrops.map(backdrop => `
         <div class="dropdown-item vertical" onclick="selectBackdrop('${backdrop._id}', '${backdrop.name.replace(/'/g, "\\'")}')">            <div class="backdrop-preview" style="
@@ -976,10 +1003,10 @@ function displayPurchaseGiftDropdown(gifts, dropdown, input) {
     }
     
     dropdown.innerHTML = gifts.map(gift => `
-        <div class="dropdown-item" onclick="selectPurchaseGift('${gift._id}', '${gift.name.replace(/'/g, "\\'")}')">            <img src="${gift.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAzNiAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjM2IiBoZWlnaHQ9IjM2IiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIxOCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Pz88L3RleHQ+Cjwvc3ZnPgo='}" 
+        <div class="dropdown-item" onclick="selectPurchaseGift('${gift._id}', '${gift.name.replace(/'/g, "\\'")}')">            <img src="${gift.imageUrl}" 
                  alt="${gift.name}" 
                  class="dropdown-image"
-                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAzNiAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjM2IiBoZWlnaHQ9IjM2IiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIxOCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzk5OTk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+OgTwvdGV4dD4KPHN2Zz4K'">
+                 style="display: ${gift.imageUrl ? 'block' : 'none'}">
             <span>${gift.name}</span>
         </div>
     `).join('');
@@ -1010,6 +1037,10 @@ function displayPurchaseBackdropDropdown(backdrops, dropdown, input) {
         if (dropdown) dropdown.style.display = 'none';
         return;
     }
+    
+    // Add grid class for >2 results
+    const gridClass = backdrops.length > 2 ? 'dropdown-grid' : '';
+    dropdown.className = `dropdown ${gridClass}`;
     
     dropdown.innerHTML = backdrops.map(backdrop => `
         <div class="dropdown-item vertical" onclick="selectPurchaseBackdrop('${backdrop._id}', '${backdrop.name.replace(/'/g, "\\'")}')">            <div class="backdrop-preview" style="background: ${backdrop.color || '#333333'}; width: 36px; height: 36px; border-radius: 8px; margin-bottom: 8px; border: 2px solid var(--border); flex-shrink: 0;"></div>
@@ -1087,11 +1118,19 @@ function displayPurchaseModelDropdown(models, dropdown, input) {
         return;
     }
     
+    // Add grid class for >2 results
+    const gridClass = models.length > 2 ? 'dropdown-grid' : '';
+    dropdown.className = `dropdown ${gridClass}`;
+    
+    // Get gift name from purchase gift input
+    const giftInput = document.getElementById('purchase-gift-search');
+    const giftName = giftInput ? giftInput.value.trim() : '';
+    
     dropdown.innerHTML = models.map(model => `
-        <div class="dropdown-item" onclick="selectPurchaseModel('${model._id}', '${model.name.replace(/'/g, "\\'")}')">            <img src="https://storage.googleapis.com/portals-market/gifts/${encodeURIComponent(selectedGift?.name?.replace(/[^a-zA-Z]/g, '').toLowerCase() || '')}/models/png/${encodeURIComponent(model.name?.replace(/[^a-zA-Z]/g, '').toLowerCase() || '')}.png" 
+        <div class="dropdown-item vertical" onclick="selectPurchaseModel('${model._id}', '${model.name.replace(/'/g, "\'")}')">            <img src="https://storage.googleapis.com/portals-market/gifts/${encodeURIComponent(giftName?.replace(/[^a-zA-Z]/g, '').toLowerCase() || '')}/models/png/${encodeURIComponent(model.name?.replace(/[^a-zA-Z]/g, '').toLowerCase() || '')}.png" 
                  alt="${model.name}" 
-                 class="model-preview"
-                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAzNiAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjM2IiBoZWlnaHQ9IjM2IiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIxOCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzk5OTk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TU9EPC90ZXh0Pgo8L3N2Zz4K'">
+                 class="dropdown-image"
+                 style="display: block">
             <span>${model.name}</span>
         </div>
     `).join('');
@@ -1106,7 +1145,7 @@ function displayPurchaseBackdropDropdown(backdrops, dropdown, input) {
     }
     
     dropdown.innerHTML = backdrops.map(backdrop => `
-        <div class="dropdown-item" onclick="selectPurchaseBackdrop('${backdrop._id}', '${backdrop.name.replace(/'/g, "\'")}')">            <div class="backdrop-preview" style="background: ${backdrop.color || '#333333'}; width: 60px; height: 60px; border-radius: 8px; margin-right: 12px; border: 2px solid var(--border); flex-shrink: 0;"></div>
+        <div class="dropdown-item vertical" onclick="selectPurchaseBackdrop('${backdrop._id}', '${backdrop.name.replace(/'/g, "\'")}')">            <div class="backdrop-preview" style="background: ${getBackdropStyle(backdrop.name)}; width: 36px; height: 36px; border-radius: 8px; margin-bottom: 8px; border: 2px solid var(--border); flex-shrink: 0;"></div>
             <span>${backdrop.name}</span>
         </div>
     `).join('');
@@ -1167,6 +1206,18 @@ function closePurchasesModal() {
             modelInput.placeholder = 'First select a gift...';
         }
         if (backdropInput) backdropInput.value = '';
+        
+        // Restore main search section visibility
+        const mainSearchSection = document.querySelector('.search-section');
+        if (mainSearchSection) {
+            mainSearchSection.style.display = 'block';
+        }
+        
+        // Restore action buttons visibility
+        const actionButtons = document.querySelector('.action-buttons');
+        if (actionButtons) {
+            actionButtons.style.display = 'flex';
+        }
     }
 }
 
@@ -1210,10 +1261,10 @@ function displayPurchaseGiftDropdown(gifts, dropdown, input) {
     
     dropdown.innerHTML = gifts.map(gift => `
         <div class="dropdown-item vertical" onclick="selectPurchaseGift('${gift._id}', '${gift.name.replace(/'/g, "\\'")}')">            <div style="position: relative; display: inline-block;">
-                <img src="${gift.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAzNiAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjM2IiBoZWlnaHQ9IjM2IiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIxOCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Pz88L3RleHQ+Cjwvc3ZnPgo='}"
-                     alt="${gift.name}" 
-                     class="dropdown-image"
-                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAzNiAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjM2IiBoZWlnaHQ9IjM2IiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIxOCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Pz88L3RleHQ+Cjwvc3ZnPgo='">
+                <img src="${gift.imageUrl}" 
+                 alt="${gift.name}" 
+                 class="dropdown-image"
+                 style="display: ${gift.imageUrl ? 'block' : 'none'}">
             </div>
             <span>${gift.name}</span>
         </div>
@@ -1512,14 +1563,14 @@ function displayMarketplaceResults(marketplace, items, tonPrice, hasError = fals
             
             const imageUrl = item.slug ? 
                 `https://nft.fragment.com/gift/${item.slug}.medium.jpg` : 
-                selectedGift?.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIyMCIgeT0iMjQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Pz88L3RleHQ+Cjwvc3ZnPgo=';
+                selectedGift?.imageUrl;
             
             itemCard.innerHTML = `
                 <div style="position: relative; display: inline-block; margin-bottom: 2px;">
                     <img src="${imageUrl}" 
                          alt="${item.name || selectedGift?.name || 'Gift'}" 
                          style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); position: relative; z-index: 1;" 
-                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIyMCIgeT0iMjQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Pz88L3RleHQ+Cjwvc3ZnPgo='">
+                         style="display: ${selectedGift?.imageUrl ? 'block' : 'none'}">
                     ${item.link ? `<a href="${item.link}" target="_blank" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; opacity: 0;"></a>` : ''}
                 </div>
                 <div style="font-size: 10px; color: var(--text-primary); margin-bottom: 2px; font-weight: 500; margin-top: 1px;">
@@ -1552,6 +1603,7 @@ function displayResults(results, tonPrice = 5.5) {
 
 
 async function displayLastPurchases(purchases) {
+    // Use modal container
     const container = document.getElementById('purchases-results');
     container.innerHTML = '';
     
@@ -1569,8 +1621,7 @@ async function displayLastPurchases(purchases) {
         const isTon = purchase.isTon === true;
         
         // Use fragment.com image if slug is available
-        const imageUrl = purchase.slug ? `https://nft.fragment.com/gift/${purchase.slug}.medium.jpg` : 
-                        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIyNCIgeT0iMjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Pz88L3RleHQ+Cjwvc3ZnPgo=';
+        const imageUrl = purchase.slug ? `https://nft.fragment.com/gift/${purchase.slug}.medium.jpg` : null;
         
         // Format date in modern style
         const purchaseDate = purchase.createdAt ? new Date(purchase.createdAt) : new Date(purchase.date);
@@ -1592,7 +1643,7 @@ async function displayLastPurchases(purchases) {
                         <img src="${imageUrl}" 
                              alt="${purchase.collectionName || purchase.gift}" 
                              class="gift-image"
-                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIyNCIgeT0iMjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Pz88L3RleHQ+Cjwvc3ZnPgo='">
+                             style="display: block">
                         ${purchase.slug ? `<a href="https://t.me/nft/${purchase.slug}" target="_blank" class="gift-link"></a>` : ''}
                     </div>
                     <div class="gift-details">
@@ -1622,12 +1673,13 @@ async function displayLastPurchases(purchases) {
                     <span class="info-label">👤 Model:</span>
                     ${purchase.modelName && (purchase.collectionName || purchase.gift) && (purchase.collectionName || purchase.gift).trim() !== '' ? 
                         `<div class="model-display">
-                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAzNiAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjM2IiBoZWlnaHQ9IjM2IiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIxOCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Pz88L3RleHQ+Cjwvc3ZnPgo='" 
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Crect width='36' height='36' fill='%23333' rx='8'/%3E%3Ctext x='18' y='22' text-anchor='middle' fill='white' font-size='10'%3E?%3C/text%3E%3C/svg%3E" 
                                  alt="${purchase.modelName}" 
                                  class="model-image"
                                  data-gift="${purchase.collectionName || purchase.gift}"
                                  data-model="${purchase.modelName}"
-                                 onload="loadModelImage(this)">
+                                 onload="loadModelImage(this)"
+                                 style="width: 36px; height: 36px; border-radius: 8px;">
                             <span>${purchase.modelName}</span>
                         </div>` : 
                         '<span class="no-data">-</span>'
@@ -1661,7 +1713,7 @@ function loadModelImage(imgElement) {
 
 async function getModelImageUrl(giftName, modelName) {
     if (!giftName || !modelName || giftName.trim() === '' || modelName.trim() === '') {
-        return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAzNiAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjM2IiBoZWlnaHQ9IjM2IiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIxOCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Pz88L3RleHQ+Cjwvc3ZnPgo=';
+        return null;
     }
     
     // Create proper URL format: /gifts/{giftname}/models/png/{modelname}.png
@@ -1670,7 +1722,7 @@ async function getModelImageUrl(giftName, modelName) {
     
     // Double check that formatted names are not empty
     if (!giftNameFormatted || !modelNameFormatted) {
-        return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAzNiAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjM2IiBoZWlnaHQ9IjM2IiByeD0iOCIgZmlsbD0iIzMzMzMzMyIvPgo8dGV4dCB4PSIxOCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Pz88L3RleHQ+Cjwvc3ZnPgo=';
+        return null;
     }
     
     const imageUrl = `https://storage.googleapis.com/portals-market/gifts/${giftNameFormatted}/models/png/${modelNameFormatted}.png`;
@@ -1822,3 +1874,189 @@ if (themeToggle) {
 
 // Store TON price globally for calculations
 window.tonPrice = tonPrice;
+
+/* --- PAGE INITIALIZATION FUNCTIONS --- */
+function initMainPage() {
+    // Initialize main search page
+    loadCollections();
+    loadModels();
+    loadBackdrops();
+}
+
+function initLastPage() {
+    // Initialize last purchases page
+    loadCollections();
+    loadModels();
+    loadBackdrops();
+    
+    // Setup search functionality for last purchases page
+    setupLastPageSearch();
+}
+
+function setupLastPageSearch() {
+    const giftInput = document.getElementById('last-gift-search');
+    const modelInput = document.getElementById('last-model-search');
+    const backdropInput = document.getElementById('last-backdrop-search');
+    const getBtn = document.getElementById('get-last-purchases-btn');
+    
+    if (giftInput) {
+        giftInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (query.length >= 2) {
+                displayLastGiftDropdown(query);
+            } else {
+                hideDropdown('last-gift-dropdown');
+                modelInput.disabled = true;
+                modelInput.placeholder = 'First select a gift...';
+                getBtn.disabled = true;
+            }
+        });
+    }
+    
+    if (modelInput) {
+        modelInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (query.length >= 1 && selectedGift) {
+                displayLastModelDropdown(query);
+            } else {
+                hideDropdown('last-model-dropdown');
+            }
+        });
+    }
+    
+    if (backdropInput) {
+        backdropInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (query.length >= 1) {
+                displayLastBackdropDropdown(query);
+            } else {
+                hideDropdown('last-backdrop-dropdown');
+            }
+        });
+    }
+}
+
+function displayLastGiftDropdown(query) {
+    const filteredGifts = collections.filter(gift => 
+        gift.name.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 10);
+    
+    const dropdown = document.getElementById('last-gift-dropdown');
+    const resultsContainer = document.getElementById('last-gift-results');
+    
+    if (filteredGifts.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+    }
+    
+    const gridClass = filteredGifts.length > 2 ? 'dropdown-grid' : '';
+    dropdown.className = `search-dropdown ${gridClass}`;
+    
+    resultsContainer.innerHTML = filteredGifts.map(gift => `
+        <div class="dropdown-item vertical" onclick="selectLastGift('${gift.slug}', '${gift.name.replace(/'/g, "\\'")}')"> 
+            <img src="https://nft.fragment.com/gift/${gift.slug}.medium.jpg" 
+                 alt="${gift.name}" 
+                 class="dropdown-image" 
+                 style="display: ${gift.slug ? 'block' : 'none'}">
+            <span>${gift.name}</span>
+        </div>
+    `).join('');
+    
+    dropdown.style.display = 'block';
+}
+
+function selectLastGift(slug, name) {
+    selectedGift = { slug, name };
+    
+    const giftInput = document.getElementById('last-gift-search');
+    const modelInput = document.getElementById('last-model-search');
+    const getBtn = document.getElementById('get-last-purchases-btn');
+    
+    giftInput.value = name;
+    hideDropdown('last-gift-dropdown');
+    
+    modelInput.disabled = false;
+    modelInput.placeholder = 'Search models...';
+    getBtn.disabled = false;
+}
+
+function displayLastModelDropdown(query) {
+    if (!selectedGift) return;
+    
+    const filteredModels = models.filter(model => 
+        model.giftSlug === selectedGift.slug &&
+        model.name.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 10);
+    
+    const dropdown = document.getElementById('last-model-dropdown');
+    const resultsContainer = document.getElementById('last-model-results');
+    
+    if (filteredModels.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+    }
+    
+    const gridClass = filteredModels.length > 2 ? 'dropdown-grid' : '';
+    dropdown.className = `search-dropdown ${gridClass}`;
+    
+    resultsContainer.innerHTML = filteredModels.map(model => `
+        <div class="dropdown-item vertical" onclick="selectLastModel('${model.slug}', '${model.name.replace(/'/g, "\\'")}')"> 
+            <img src="https://nft.fragment.com/model/${model.slug}.medium.jpg" 
+                 alt="${model.name}" 
+                 class="dropdown-image" 
+                 style="display: block">
+            <span>${model.name}</span>
+        </div>
+    `).join('');
+    
+    dropdown.style.display = 'block';
+}
+
+function selectLastModel(slug, name) {
+    selectedModel = { slug, name };
+    
+    const modelInput = document.getElementById('last-model-search');
+    modelInput.value = name;
+    hideDropdown('last-model-dropdown');
+}
+
+function displayLastBackdropDropdown(query) {
+    const filteredBackdrops = backdrops.filter(backdrop => 
+        backdrop.name.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 10);
+    
+    const dropdown = document.getElementById('last-backdrop-dropdown');
+    const resultsContainer = document.getElementById('last-backdrop-results');
+    
+    if (filteredBackdrops.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+    }
+    
+    const gridClass = filteredBackdrops.length > 2 ? 'dropdown-grid' : '';
+    dropdown.className = `search-dropdown ${gridClass}`;
+    
+    resultsContainer.innerHTML = filteredBackdrops.map(backdrop => `
+        <div class="dropdown-item vertical" onclick="selectLastBackdrop('${backdrop.slug}', '${backdrop.name.replace(/'/g, "\\'")}')"> 
+            <div class="backdrop-preview" style="background: ${backdrop.preview || '#333'};"></div>
+            <span>${backdrop.name}</span>
+        </div>
+    `).join('');
+    
+    dropdown.style.display = 'block';
+}
+
+function selectLastBackdrop(slug, name) {
+    selectedBackdrop = { slug, name };
+    
+    const backdropInput = document.getElementById('last-backdrop-search');
+    backdropInput.value = name;
+    hideDropdown('last-backdrop-dropdown');
+}
+
+
+
+// Initialize routing when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initApp();
+});

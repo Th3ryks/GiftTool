@@ -520,8 +520,8 @@ body {
 
 /* Modern Purchases Grid */
 .purchases-grid-container {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 16px;
     margin-top: 20px;
 }
@@ -612,7 +612,9 @@ body {
 .model-display {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
+    text-align: center;
 }
 
 .backdrop-preview {
@@ -946,8 +948,8 @@ body {
     min-width: 80px;
 }
 
-/* Dropdown Grid for >4 results */
-.dropdown-grid {
+/* Dropdown Grid for >2 results */
+.dropdown-grid, .search-dropdown.dropdown-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
@@ -956,23 +958,43 @@ body {
     overflow-y: auto;
 }
 
-.dropdown-grid .dropdown-item {
+.dropdown-grid .dropdown-item, .search-dropdown.dropdown-grid .dropdown-item {
     margin: 0;
     padding: 8px;
     text-align: center;
     border-radius: 8px;
     transition: background-color 0.2s;
+    border: 1px solid transparent;
 }
 
-.dropdown-grid .dropdown-item:hover {
+.dropdown-grid .dropdown-item:hover, .search-dropdown.dropdown-grid .dropdown-item:hover {
     background-color: var(--hover-bg);
+    border-color: var(--border);
 }
 
-.dropdown-grid .dropdown-item span {
+.dropdown-grid .dropdown-item span, .search-dropdown.dropdown-grid .dropdown-item span {
     font-size: 11px;
     margin-top: 4px;
     display: block;
     line-height: 1.2;
+    word-wrap: break-word;
+}
+
+/* Mobile responsive grid */
+@media (max-width: 480px) {
+    .dropdown-grid, .search-dropdown.dropdown-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        padding: 8px;
+    }
+    
+    .dropdown-grid .dropdown-item, .search-dropdown.dropdown-grid .dropdown-item {
+        padding: 6px;
+    }
+    
+    .dropdown-grid .dropdown-item span, .search-dropdown.dropdown-grid .dropdown-item span {
+        font-size: 10px;
+    }
 }
 
 /* Responsive Design */
@@ -1046,50 +1068,34 @@ body {
 
 
 
-/* Marketplace grid responsive styles */
-.marketplace-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin-bottom: 10px;
+.page-content h2 {
+    color: var(--text-primary);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    text-align: center;
 }
 
+.page-content p {
+    color: var(--text-secondary);
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+/* --- MARKETPLACE FEATURES --- */
+
+
+/* --- RESPONSIVE DESIGN --- */
 @media (max-width: 768px) {
-    .marketplace-grid {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 6px;
-    }
+    /* Responsive styles for mobile */
 }
 
-@media (max-width: 480px) {
-    .marketplace-grid {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 4px;
-    }
-}
 
-@media (max-width: 400px) {
-    .marketplace-grid {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 2px;
-        font-size: 11px;
-    }
-    
-    .marketplace-grid > div {
-        padding: 4px !important;
-        min-height: auto;
-    }
-    
-    .marketplace-grid > div > div:not(:first-child) {
-        font-size: 10px !important;
-        gap: 1px !important;
-    }
-    
-    .marketplace-grid .market-name {
-        font-size: 10px !important;
-        padding: 2px 4px !important;
-    }
-}
+
+
+
 
 .error-message {
     position: fixed;

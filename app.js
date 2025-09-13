@@ -559,18 +559,12 @@ async function getLastPurchases() {
         const purchases = await response.json();
         await displayLastPurchases(purchases);
         
-        // Hide search menu and show search button in header after getting results
+        // Hide search form in Last Purchases after getting results
         if (purchases.length > 0) {
-            // Hide search section
-            const searchSection = document.querySelector('.search-section');
-            if (searchSection) {
-                searchSection.style.display = 'none';
-            }
-            
-            // Show search button in header
-            const headerSearchBtn = document.querySelector('.search-new-gift-btn');
-            if (headerSearchBtn) {
-                headerSearchBtn.style.display = 'block';
+            // Hide search section in last purchases container
+            const purchaseSearchSection = document.querySelector('#last-purchases-container .search-section');
+            if (purchaseSearchSection) {
+                purchaseSearchSection.style.display = 'none';
             }
         }
         
@@ -1171,15 +1165,86 @@ function updatePurchaseButton() {
 }
 
 // Modal functions
-function openLastPurchases() {
-    const modal = document.getElementById('purchases-modal');
-    if (modal) {
-        modal.classList.add('active');
-        modal.style.display = 'flex';
-        
-        // Initialize modal search functionality
-        initializePurchaseSearch();
+function toggleLastPurchases() {
+    const lastPurchasesContainer = document.getElementById('last-purchases-container');
+    const isLastPurchasesVisible = lastPurchasesContainer && lastPurchasesContainer.style.display === 'block';
+    
+    if (isLastPurchasesVisible) {
+        // If Last Purchases is currently visible, clear fields and results
+        clearLastPurchasesData();
+    } else {
+        // If Search is visible, switch to Last Purchases
+        openLastPurchases();
     }
+}
+
+function clearLastPurchasesData() {
+    // Clear input fields
+    const giftInput = document.getElementById('purchase-gift-search');
+    const modelInput = document.getElementById('purchase-model-search');
+    const backdropInput = document.getElementById('purchase-backdrop-search');
+    
+    if (giftInput) giftInput.value = '';
+    if (modelInput) {
+        modelInput.value = '';
+        modelInput.disabled = true;
+        modelInput.placeholder = 'First select a gift...';
+    }
+    if (backdropInput) backdropInput.value = '';
+    
+    // Clear results
+    const purchasesResults = document.getElementById('purchases-results');
+    if (purchasesResults) {
+        purchasesResults.innerHTML = '';
+        purchasesResults.style.display = 'none';
+    }
+    
+    // Reset Get Purchases button
+    const getPurchasesBtn = document.getElementById('get-purchases-btn');
+    if (getPurchasesBtn) {
+        getPurchasesBtn.innerHTML = '<span>📊</span> Get Purchases';
+        getPurchasesBtn.onclick = getLastPurchases;
+        getPurchasesBtn.disabled = true;
+    }
+    
+    // Show the search form again
+    const purchaseSearchSection = document.querySelector('#last-purchases-container .search-section');
+    if (purchaseSearchSection) {
+        purchaseSearchSection.style.display = 'block';
+    }
+}
+
+function openLastPurchases() {
+    // Set active tab
+    setActiveTab('openLastPurchases');
+    
+    // Hide main search section but keep it accessible for return
+    const searchSection = document.querySelector('.search-section');
+    if (searchSection) {
+        searchSection.style.display = 'none';
+    }
+    
+    // Hide results section
+    const resultsContainer = document.getElementById('results-section');
+    if (resultsContainer) {
+        resultsContainer.innerHTML = '';
+        resultsContainer.classList.remove('active');
+    }
+    
+    // Show last purchases container
+    const lastPurchasesContainer = document.getElementById('last-purchases-container');
+    if (lastPurchasesContainer) {
+        lastPurchasesContainer.style.display = 'block';
+    }
+    
+    // Show the search form within Last Purchases
+    const purchaseSearchSection = document.querySelector('#last-purchases-container .search-section');
+    if (purchaseSearchSection) {
+        purchaseSearchSection.style.display = 'block';
+    }
+    
+    // Initialize purchase search functionality
+    initializePurchaseSearch();
 }
 
 function closePurchasesModal() {
@@ -1337,7 +1402,33 @@ function initializeResultsContainer() {
     }
 }
 
+function setActiveTab(tabName) {
+    // Remove active class from all tabs
+    const allTabs = document.querySelectorAll('.header-nav-btn');
+    allTabs.forEach(tab => tab.classList.remove('active'));
+    
+    // Add active class to specified tab
+    let activeTab;
+    if (tabName === 'openLastPurchases') {
+        activeTab = document.querySelector('.header-nav-btn[onclick*="toggleLastPurchases"]');
+    } else {
+        activeTab = document.querySelector(`.header-nav-btn[onclick*="${tabName}"]`);
+    }
+    if (activeTab) {
+        activeTab.classList.add('active');
+    }
+}
+
 function showSearchMenu() {
+    // Set active tab
+    setActiveTab('showSearchMenu');
+    
+    // Hide last purchases container
+    const lastPurchasesContainer = document.getElementById('last-purchases-container');
+    if (lastPurchasesContainer) {
+        lastPurchasesContainer.style.display = 'none';
+    }
+    
     // Show search section
     const searchSection = document.querySelector('.search-section');
     if (searchSection) {
@@ -1361,6 +1452,7 @@ function showSearchMenu() {
     const purchasesResults = document.getElementById('purchases-results');
     if (purchasesResults) {
         purchasesResults.innerHTML = '';
+        purchasesResults.style.display = 'none';
     }
     
     // Reset Get Purchases button
@@ -1387,6 +1479,21 @@ function showSearchMenu() {
         modelInput.value = '';
         modelInput.disabled = true;
         modelInput.placeholder = 'First select a gift...';
+    }
+    
+    // Clear Last Purchases input fields
+    const purchaseGiftInput = document.getElementById('purchase-gift-search');
+    const purchaseModelInput = document.getElementById('purchase-model-search');
+    const purchaseBackdropInput = document.getElementById('purchase-backdrop-search');
+    
+    if (purchaseGiftInput) purchaseGiftInput.value = '';
+    if (purchaseModelInput) purchaseModelInput.value = '';
+    if (purchaseBackdropInput) purchaseBackdropInput.value = '';
+    
+    // Show Last Purchases search form again
+    const purchaseSearchSection = document.querySelector('#last-purchases-container .search-section');
+    if (purchaseSearchSection) {
+        purchaseSearchSection.style.display = 'block';
     }
     if (backdropInput) backdropInput.value = '';
     
@@ -1605,7 +1712,17 @@ function displayResults(results, tonPrice = 5.5) {
 async function displayLastPurchases(purchases) {
     // Use modal container
     const container = document.getElementById('purchases-results');
+    if (!container) {
+        console.error('purchases-results container not found');
+        return;
+    }
+    
     container.innerHTML = '';
+    
+    // Make sure the container is visible
+    container.style.display = 'block';
+    container.style.visibility = 'visible';
+    container.style.opacity = '1';
     
     if (purchases.length === 0) {
         container.innerHTML = '<p class="no-results">No recent purchases found</p>';
@@ -1879,14 +1996,12 @@ window.tonPrice = tonPrice;
 function initMainPage() {
     // Initialize main search page
     loadCollections();
-    loadModels();
     loadBackdrops();
 }
 
 function initLastPage() {
     // Initialize last purchases page
     loadCollections();
-    loadModels();
     loadBackdrops();
     
     // Setup search functionality for last purchases page

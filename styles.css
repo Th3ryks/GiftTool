@@ -67,13 +67,11 @@ body {
 
 /* --- HEADER --- */
 .header {
-    background: var(--card-bg);
-    border-bottom: 2px solid var(--border);
+    background: transparent;
     padding: 12px 0;
     position: sticky;
     top: 0;
     z-index: 100;
-    backdrop-filter: blur(10px);
 }
 
 .header-content {
@@ -1066,7 +1064,83 @@ body {
     100% { transform: rotate(360deg); }
 }
 
+/* Header Navigation Buttons */
+.header-nav-btn {
+    background: transparent;
+    color: var(--text-primary);
+    border: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    white-space: nowrap;
+    min-width: auto;
+    width: auto;
+}
 
+.header-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--primary-color);
+}
+
+.header-nav-btn:active {
+    transform: scale(0.95);
+}
+
+/* Active tab highlighting */
+.header-nav-btn.active {
+    color: var(--primary-color) !important;
+    font-weight: 600 !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Update theme toggle to match transparent style */
+.theme-toggle {
+    background: transparent !important;
+    color: var(--text-primary) !important;
+    border: none !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+    min-width: auto !important;
+    width: auto !important;
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: var(--primary-color) !important;
+}
+
+.theme-toggle:active {
+    transform: scale(0.95) !important;
+}
+
+/* Header buttons container */
+.header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent !important;
+}
+
+/* Mobile responsive for header buttons */
+@media (max-width: 768px) {
+    .header-nav-btn,
+    .theme-toggle {
+        padding: 6px 10px !important;
+        font-size: 13px !important;
+    }
+    
+    .header-buttons {
+        gap: 6px;
+    }
+}
 
 .page-content h2 {
     color: var(--text-primary);

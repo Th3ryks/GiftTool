@@ -145,6 +145,44 @@ const API_CONFIG = {
     }
 };
 
+/* --- FULLSCREEN FUNCTIONALITY --- */
+function requestFullscreen() {
+    const element = document.documentElement;
+    
+    if (element.requestFullscreen) {
+        element.requestFullscreen().catch(err => {
+            console.log('Fullscreen request failed:', err);
+        });
+    } else if (element.webkitRequestFullscreen) {
+        element.webkitRequestFullscreen();
+    } else if (element.msRequestFullscreen) {
+        element.msRequestFullscreen();
+    } else if (element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+    }
+}
+
+function exitFullscreen() {
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+    }
+}
+
+function toggleFullscreen() {
+    if (document.fullscreenElement || document.webkitFullscreenElement || 
+        document.msFullscreenElement || document.mozFullScreenElement) {
+        exitFullscreen();
+    } else {
+        requestFullscreen();
+    }
+}
+
 /* --- INITIALIZATION --- */
 document.addEventListener('DOMContentLoaded', async () => {
     await initializeApp();
@@ -162,6 +200,9 @@ async function initializeApp() {
 
         
         console.log('App initialized successfully');
+        
+        // Request fullscreen mode
+        requestFullscreen();
     } catch (error) {
         console.error('Failed to initialize app:', error);
         // Silently handle initialization errors - app can still work partially

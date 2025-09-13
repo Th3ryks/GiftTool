@@ -1553,8 +1553,8 @@ function displayMarketplaceResults(marketplace, items, tonPrice, hasError = fals
             
             let tonPrice_item = parseFloat(item.price) || 0;
             
-            // Add 6% markup for portals and tonnel marketplaces
-            if (marketplace.toLowerCase().includes('portals') || marketplace.toLowerCase().includes('tonnel')) {
+            // Add 6% markup only for tonnel marketplace
+            if (marketplace.toLowerCase().includes('tonnel')) {
                 tonPrice_item = tonPrice_item * 1.06;
             }
             
